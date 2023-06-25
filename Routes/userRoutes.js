@@ -10,11 +10,16 @@ const SignUpSchema = joi.object({
   email: joi.string().email().required(),
   password: joi.string().required().max(20),
 });
+const LoginSchema = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().required().max(20),
+});
 
 router.post(
   "/api/signUp",
   validation.body(SignUpSchema),
   userController.signUp
 );
+router.post("/api/Login", validation.body(LoginSchema), userController.Login);
 
 module.exports = router;
