@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const userRoutes = require("./Routes/userRoutes");
+const messageRoutes = require("./Routes/messageRoutes");
 dotenv.config();
 const port = process.env.PORT || 9000;
 const dbURI = process.env.DATABASE;
@@ -28,6 +29,7 @@ mongoose
     console.error("Error connecting to MongoDB:", error);
   });
 app.use(userRoutes);
+app.use(messageRoutes);
 
 app.use(express.urlencoded({ extended: false }));
 
