@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const userRoutes = require("./Routes/userRoutes");
 const messageRoutes = require("./Routes/messageRoutes");
+const cors = require("cors");
 dotenv.config();
 const port = process.env.PORT || 9000;
 const dbURI = process.env.DATABASE;
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 app.get("/", (req, res) => {
