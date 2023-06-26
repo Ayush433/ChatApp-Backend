@@ -4,6 +4,7 @@ const router = express.Router();
 const validation = require("express-joi-validation").createValidator({});
 const userController = require("../Controller/userController");
 const auth = require("../Middleware/auth");
+const messageController = require("../Controller/messageController");
 
 const SignUpSchema = joi.object({
   fullName: joi.string().min(5).max(20).required(),
@@ -21,5 +22,6 @@ router.post(
   userController.signUp
 );
 router.post("/api/Login", validation.body(LoginSchema), userController.Login);
+router.get("/api/allUsers", messageController.allUsers);
 
 module.exports = router;
