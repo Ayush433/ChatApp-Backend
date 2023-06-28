@@ -11,7 +11,7 @@ module.exports.message = async (req, res) => {
     const newConversation = new Conversation({
       members: [senderId, receiverId],
     });
-    console.log("convo", newConversation);
+    // console.log("convo", newConversation);
     await newConversation.save();
     return res.status(200).json({
       status: 200,
@@ -39,7 +39,7 @@ module.exports.singleMessage = async (req, res) => {
     const conversationUserData = [];
 
     for (const conversation of conversations) {
-      console.log("members", conversation.members);
+      // console.log("members", conversation.members);
 
       const receiverId = conversation.members.find(
         (member) => member !== userId
@@ -59,7 +59,7 @@ module.exports.singleMessage = async (req, res) => {
             conversationId: conversation._id,
           });
         } else {
-          console.log(`User not found for receiverId: ${receiverId}`);
+          // console.log(`User not found for receiverId: ${receiverId}`);
         }
       } catch (error) {
         console.log(`Error finding user: ${error}`);
@@ -121,17 +121,21 @@ module.exports.messages = async (req, res) => {
 module.exports.conversationId = async (req, res) => {
   try {
     const conversationId = req.params.conversationId;
+    console.log("conversation", conversationId);
     if (!conversationId === "new")
       return res.status(201).json({
         status: 201,
         message: "Conversation Id is Required",
       });
     const messages = await Message.find({ conversationId });
+    console.log("Message", messages);
     const messageUserData = Promise.all(
       messages.map(async (message) => {
         const user = await User.findById(message.senderId);
+        console.log(user);
         return {
           user: {
+            id: user._id,
             email: user ? user.email : "",
             fullName: user.fullName,
           },
