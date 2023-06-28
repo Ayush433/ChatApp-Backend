@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { ObjectId } = mongoose.Schema;
 const userSchema = mongoose.Schema(
   {
     fullName: {
@@ -12,6 +12,10 @@ const userSchema = mongoose.Schema(
       unique: true,
     },
     password: {
+      type: String,
+      required: true,
+    },
+    confirmPassword: {
       type: String,
       required: true,
     },

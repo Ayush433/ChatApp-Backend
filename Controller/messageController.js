@@ -3,14 +3,15 @@ const Conversation = require("../Models/ConversationModel");
 const User = require("../Models/userModel");
 const Message = require("../Models/MessageModel");
 
-//"/api/conversation"
-module.exports.messages = async (req, res) => {
+//"/api/conversation" // message side mah ko ko sanga conversation greko xa vnerw thaa  pauna lai
+module.exports.message = async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
 
     const newConversation = new Conversation({
       members: [senderId, receiverId],
     });
+    console.log("convo", newConversation);
     await newConversation.save();
     return res.status(200).json({
       status: 200,
@@ -29,25 +30,40 @@ module.exports.messages = async (req, res) => {
 module.exports.singleMessage = async (req, res) => {
   try {
     const userId = req.params.userId;
+    console.log("id", userId);
 
-    const conversations = await Conversation.find({ members: userId });
+    const conversations = await Conversation.find({
+      members: { $in: [userId] },
+    });
 
     const conversationUserData = [];
 
     for (const conversation of conversations) {
+      console.log("members", conversation.members);
+
       const receiverId = conversation.members.find(
         (member) => member !== userId
       );
-      const user = await User.findById(receiverId);
 
-      conversationUserData.push({
-        user: {
-          receiverId: user._id,
-          email: user.email,
-          fullName: user.fullName,
-        },
-        conversationId: conversation._id,
-      });
+      try {
+        const user = await User.findById(receiverId);
+        console.log("u", user);
+
+        if (user) {
+          conversationUserData.push({
+            user: {
+              receiverId: user._id,
+              email: user.email || "",
+              fullName: user.fullName,
+            },
+            conversationId: conversation._id,
+          });
+        } else {
+          console.log(`User not found for receiverId: ${receiverId}`);
+        }
+      } catch (error) {
+        console.log(`Error finding user: ${error}`);
+      }
     }
 
     res.status(200).json(conversationUserData);
@@ -55,6 +71,7 @@ module.exports.singleMessage = async (req, res) => {
     console.log(error);
   }
 };
+
 //api:- "/api/message"
 module.exports.messages = async (req, res) => {
   try {
@@ -115,7 +132,7 @@ module.exports.conversationId = async (req, res) => {
         const user = await User.findById(message.senderId);
         return {
           user: {
-            email: user.email,
+            email: user ? user.email : "",
             fullName: user.fullName,
           },
           message: message.message,
