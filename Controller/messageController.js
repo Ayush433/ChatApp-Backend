@@ -9,11 +9,11 @@ module.exports.message = async (req, res) => {
     const { senderId, receiverId } = req.body;
     console.log("senderid", senderId);
 
-    const newConversation = new Conversation({
+    const newConversation = await new Conversation({
       members: [senderId, receiverId],
     });
     await newConversation.save();
-    const newMessage = new Message({
+    const newMessage = await new Message({
       conversationId: newConversation._id,
       senderId,
       message: "",
@@ -24,6 +24,7 @@ module.exports.message = async (req, res) => {
     return res.status(200).json({
       status: 200,
       message: "Conversation Created Successfully",
+      newMessage,
     });
   } catch (error) {
     console.log(error);
@@ -102,7 +103,8 @@ module.exports.messages = async (req, res) => {
       await newMessage.save();
       return res.status(200).json({
         status: 200,
-        message: "Message Successfully Created",
+        newConversation,
+        newMessage,
       });
     } else if (!conversationId && !receiverId) {
       return res.status(400).json({
