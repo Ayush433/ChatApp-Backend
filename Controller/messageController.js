@@ -7,12 +7,20 @@ const Message = require("../Models/MessageModel");
 module.exports.message = async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
+    console.log("senderid", senderId);
 
     const newConversation = new Conversation({
       members: [senderId, receiverId],
     });
-    // console.log("convo", newConversation);
     await newConversation.save();
+    const newMessage = new Message({
+      conversationId: newConversation._id,
+      senderId,
+      message: "",
+    });
+    await newMessage.save();
+    // console.log("convo", newConversation);
+
     return res.status(200).json({
       status: 200,
       message: "Conversation Created Successfully",
@@ -59,7 +67,6 @@ module.exports.singleMessage = async (req, res) => {
             conversationId: conversation._id,
           });
         } else {
-          // console.log(`User not found for receiverId: ${receiverId}`);
         }
       } catch (error) {
         console.log(`Error finding user: ${error}`);
@@ -76,12 +83,13 @@ module.exports.singleMessage = async (req, res) => {
 module.exports.messages = async (req, res) => {
   try {
     const { conversationId, senderId, message, receiverId = "" } = req.body;
+    console.log(conversationId, senderId, message, receiverId);
     if (!senderId || !message)
       return res.status(400).json({
         status: 400,
         message: "Please Fill all the required Field",
       });
-    if (!conversationId && receiverId) {
+    if (!conversationId === "new" && receiverId) {
       const newConversation = new Conversation({
         message: [senderId, receiverId],
       });
