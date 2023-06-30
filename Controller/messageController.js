@@ -95,7 +95,7 @@ module.exports.messages = async (req, res) => {
         message: [senderId, receiverId],
       });
       await newConversation.save();
-      const newMessage = new Message({
+      const newMessage = await new Message({
         conversationId: newConversation._id,
         senderId,
         message,
@@ -114,7 +114,7 @@ module.exports.messages = async (req, res) => {
         message: "Please Fill all the form",
       });
     }
-    const newMessage = new Message({
+    const newMessage = await new Message({
       conversationId,
       senderId,
       message,
