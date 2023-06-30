@@ -19,6 +19,8 @@ module.exports.message = async (req, res) => {
       message: "",
     });
     await newMessage.save();
+    console.log("newConversation", newConversation);
+    console.log("newMessage", newMessage);
     // console.log("convo", newConversation);
 
     return res.status(200).json({
@@ -90,11 +92,13 @@ module.exports.messages = async (req, res) => {
         status: 400,
         message: "Please Fill all the required Field",
       });
-    if (!conversationId === "new" && receiverId) {
+    if (conversationId === "new" && receiverId) {
       const newConversation = new Conversation({
-        message: [senderId, receiverId],
+        members: [senderId, receiverId],
       });
+
       await newConversation.save();
+      console.log(newConversation);
       const newMessage = await new Message({
         conversationId: newConversation._id,
         senderId,
@@ -102,11 +106,10 @@ module.exports.messages = async (req, res) => {
         receiverId,
       });
       await newMessage.save();
+      console.log("newMessage", newMessage);
       return res.status(200).json({
         status: 200,
-        newConversation,
-        newMessage,
-        receiverId,
+        message: "send Successfully",
       });
     } else if (!conversationId && !receiverId) {
       return res.status(400).json({
@@ -121,6 +124,7 @@ module.exports.messages = async (req, res) => {
       receiverId,
     });
     await newMessage.save();
+    console.log("newMessage", newMessage);
     return res.status(200).json({
       status: 200,
       message: "Send Successfully",
@@ -139,7 +143,7 @@ module.exports.conversationId = async (req, res) => {
   try {
     const conversationId = req.params.conversationId;
     console.log("conversation", conversationId);
-    if (!conversationId === "new")
+    if (conversationId === "new")
       return res.status(201).json({
         status: 201,
         message: "Conversation Id is Required",
