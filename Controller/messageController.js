@@ -99,12 +99,14 @@ module.exports.messages = async (req, res) => {
         conversationId: newConversation._id,
         senderId,
         message,
+        receiverId,
       });
       await newMessage.save();
       return res.status(200).json({
         status: 200,
         newConversation,
         newMessage,
+        receiverId,
       });
     } else if (!conversationId && !receiverId) {
       return res.status(400).json({
@@ -112,7 +114,12 @@ module.exports.messages = async (req, res) => {
         message: "Please Fill all the form",
       });
     }
-    const newMessage = new Message({ conversationId, senderId, message });
+    const newMessage = new Message({
+      conversationId,
+      senderId,
+      message,
+      receiverId,
+    });
     await newMessage.save();
     return res.status(200).json({
       status: 200,

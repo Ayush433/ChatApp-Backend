@@ -29,13 +29,14 @@ io.on("connection", (socket) => {
   socket.on(
     "sendMessages",
     async ({ senderId, message, conversationId, receiverId }) => {
-      const receiver = users.find((user) => user.userId);
-      // const sender = users.find((user) => user.senderId);
+      const receiver = users.find((user) => user.userId === receiverId);
+      const sender = users.find((user) => user.userId === senderId);
       if (receiver) {
         io.to(receiver.socketId).to(sender.socketId).emit("getMessage", {
           senderId,
           message,
           conversationId,
+          receiverId,
         });
       }
     }
