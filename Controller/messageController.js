@@ -2,41 +2,54 @@ const { trace } = require("joi");
 const Conversation = require("../Models/ConversationModel");
 const User = require("../Models/userModel");
 const Message = require("../Models/MessageModel");
+const { v4: uuidv4 } = require("uuid");
 
 //"/api/conversation" // message side mah ko ko sanga conversation greko xa vnerw thaa  pauna lai
 module.exports.message = async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
-    console.log("senderid", senderId);
+    console.log("senderId", senderId);
 
-    const newConversation = await new Conversation({
-      members: [senderId, receiverId],
+    const existingConversation = await Conversation.findOne({
+      members: { $all: [senderId, receiverId] },
     });
-    await newConversation.save();
-    const newMessage = await new Message({
-      conversationId: newConversation._id,
+
+    let newConversationId;
+    if (existingConversation) {
+      newConversationId = existingConversation._id;
+    } else {
+      newConversationId = uuidv4(); // Generate a unique conversation ID
+      const newConversation = new Conversation({
+        _id: newConversationId,
+        members: [senderId, receiverId],
+      });
+      await newConversation.save();
+    }
+
+    const newMessage = new Message({
+      conversationId: newConversationId,
       senderId,
       message: "",
     });
     await newMessage.save();
-    console.log("newConversation", newConversation);
+
+    console.log("newConversation", newConversationId);
     console.log("newMessage", newMessage);
-    // console.log("convo", newConversation);
 
     return res.status(200).json({
       status: 200,
       message: "Conversation Created Successfully",
+      newConversationId, // Return the conversation ID to the frontend
       newMessage,
     });
   } catch (error) {
     console.log(error);
-    retune.status(400).json({
+    return res.status(400).json({
       status: 400,
       message: { error },
     });
   }
 };
-
 // api :- "/api/conversation/:userId"
 module.exports.singleMessage = async (req, res) => {
   try {
@@ -171,6 +184,24 @@ module.exports.conversationId = async (req, res) => {
 };
 
 //api:- "/api/allUsers"
+// module.exports.allUsers = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     const user = await User.find({ _id: { $ne: userId } });
+//     const usersData = Promise.all(
+//       user.map(async (user) => {
+//         return {
+//           user: {
+//             email: user.email,
+//             fullName: user.fullName,
+//             receiverId: user._id,
+//           },
+//         };
+//       })
+//     );
+//     return res.status(200).json(await usersData);
+//   } catch (error) {}
+// };
 module.exports.allUsers = async (req, res) => {
   try {
     const user = await User.find();

@@ -72,7 +72,6 @@ mongoose
   });
 app.use(userRoutes);
 app.use(messageRoutes);
-
 app.use(express.urlencoded({ extended: false }));
 
 // Additional routes and middleware can be defined here
