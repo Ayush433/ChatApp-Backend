@@ -95,9 +95,7 @@ app.post("/api/register", async (req, res, next) => {
           newUser.save();
           next();
         });
-        return res
-          .status(200)
-          .send(toast.success("User registered successfully Registered"));
+        return res.status(200);
       }
     }
   } catch (error) {
