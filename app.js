@@ -95,7 +95,7 @@ app.post("/api/register", async (req, res, next) => {
           newUser.save();
           next();
         });
-        return res.status(200);
+        return res.status(200).send("User registered successfully");
       }
     }
   } catch (error) {
