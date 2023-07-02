@@ -1,15 +1,12 @@
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const app = express();
-const server = require("http").createServer(app);
-
-const io = require("socket.io")(server, {
+require("dotenv").config();
+const io = require("socket.io")(8080, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: "http://localhost:5173",
   },
 });
 
@@ -19,7 +16,7 @@ const Conversations = require("./Models/ConversationModel");
 const Messages = require("./Models/MessageModel");
 
 // app Use
-
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
@@ -129,7 +126,7 @@ app.post("/api/login", async (req, res, next) => {
           };
           const JWT_SECRET_KEY =
             process.env.JWT_SECRET_KEY || "THIS_IS_A_JWT_SECRET_KEY";
-          // console.log("JWT_SECRET_KEY", JWT_SECRET_KEY);
+          console.log("JWT_SECRET_KEY", JWT_SECRET_KEY);
 
           jwt.sign(
             payload,
@@ -296,7 +293,7 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
-    server.listen(port, () => {
+    app.listen(port, () => {
       console.log(`Server started at Port number ${port}`);
     });
   })
