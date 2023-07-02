@@ -1,9 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-require("dotenv").config();
+
 const io = require("socket.io")(8080, {
   cors: {
     origin: "http://localhost:5173",
@@ -95,7 +96,9 @@ app.post("/api/register", async (req, res, next) => {
           newUser.save();
           next();
         });
-        return res.status(200).send("User registered successfully");
+        return res
+          .status(200)
+          .send(toast.success("User registered successfully Registered"));
       }
     }
   } catch (error) {
@@ -124,6 +127,7 @@ app.post("/api/login", async (req, res, next) => {
           };
           const JWT_SECRET_KEY =
             process.env.JWT_SECRET_KEY || "THIS_IS_A_JWT_SECRET_KEY";
+          // console.log("JWT_SECRET_KEY", JWT_SECRET_KEY);
 
           jwt.sign(
             payload,
@@ -179,7 +183,9 @@ app.get("/api/conversations/:userId", async (req, res) => {
         const receiverId = conversation.members.find(
           (member) => member !== userId
         );
+        console.log("receiverId", receiverId);
         const user = await Users.findById(receiverId);
+        console.log("userid ho hai", user);
         return {
           user: {
             receiverId: user._id,
@@ -206,12 +212,14 @@ app.post("/api/message", async (req, res) => {
         members: [senderId, receiverId],
       });
       await newCoversation.save();
+      console.log("newConversation", newCoversation);
       const newMessage = new Messages({
         conversationId: newCoversation._id,
         senderId,
         message,
       });
       await newMessage.save();
+      console.log("newMessage", newMessage);
       return res.status(200).send("Message sent successfully");
     } else if (!conversationId && !receiverId) {
       return res.status(400).send("Please fill all required fields");
