@@ -4,10 +4,12 @@ const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const app = express();
+const server = require("http").createServer(app);
 
-const io = require("socket.io")(8080, {
+const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
   },
 });
 
@@ -17,7 +19,7 @@ const Conversations = require("./Models/ConversationModel");
 const Messages = require("./Models/MessageModel");
 
 // app Use
-const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
@@ -294,7 +296,7 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server started at Port number ${port}`);
     });
   })
